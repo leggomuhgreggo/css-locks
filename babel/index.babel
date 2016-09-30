@@ -1,0 +1,68 @@
+console.clear();
+
+var paragraphs = document.querySelectorAll('h1, h2, h3, p');
+
+function updateInfo() {
+    Array.prototype.forEach.call(paragraphs, function (p) {
+        var styles = getComputedStyle(p);
+        var lh = parseFloat(styles.lineHeight.replace('px', ''));
+        var fs = parseFloat(styles.fontSize.replace('px', ''));
+        var ratio = Math.round((lh / fs) * 100) / 100;
+        var roundedFs = Math.round(fs * 100) / 100;
+        p.setAttribute('data-info', roundedFs + 'px / ' + ratio);
+    });
+}
+
+updateInfo();
+
+window.addEventListener('resize', function(){
+    updateInfo()
+    getCPL(paragraphs[1])
+});
+
+
+function getCPL(el){
+    let span = document.createElement('span')
+    let styles = window.getComputedStyle(el);
+    let padding = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+    let containerWidth = el.clientWidth - padding;
+    let samples = 1;
+    let aggregateCPL = 0;
+    let text = `born like this
+into this
+as the chalk faces smile
+as Mrs. Death laughs
+as the elevators break
+as political landscapes dissolve
+as the supermarket bag boy holds a college degree
+as the oily fish spit out their oily prey
+as the sun is masked
+
+we are 
+born like this
+into this
+into these carefully mad wars
+into the sight of broken factory windows of emptiness
+into bars where people no longer speak to each other
+into fist fights that end as shootings and knifings...`;
+    
+    document.body.appendChild(span);
+    span.style.whiteSpace = 'nowrap';
+    
+    for(let j=0; j < samples; j++){
+        var spanWidth = span.getBoundingClientRect().width
+        
+        while(spanWidth < containerWidth) {
+            span.innerHTML += text[aggregateCPL];
+            spanWidth = span.getBoundingClientRect().width
+            aggregateCPL++
+        }
+    
+        span.innerHTML = '';
+    }
+    let avgCPL = aggregateCPL/samples
+    console.log(avgCPL)
+    
+    
+};
+

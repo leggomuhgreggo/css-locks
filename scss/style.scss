@@ -1,0 +1,317 @@
+@mixin css-lock(
+    $lock-width-min: 430px,
+    $lock-width-max: 960px,
+    $font-size-min: '',
+    $font-size-max: '',
+    $line-height-min: '',
+    $line-height-max: '',
+    $root: false,
+    $lock: true,
+    $prop:'',
+    $prop-min:'',
+    $prop-max:''
+) { 
+    // GENERAL CHECKS
+    @if unit($lock-width-min) != unit($lock-width-max) or unit($lock-width-min) !='px' {
+        @warn 'Please make sure the screen width values both have px units.';
+    }
+
+    // FONT SIZE
+    @if $font-size-min != '' and $font-size-max != ''{
+        
+        // FONT SIZE CHECK
+        @if unit($font-size-min) != unit($font-size-max) or unit($font-size-min) !='px' {
+            @warn 'Please enter font-size values in px units';
+        }
+        @else{
+            // FONT SIZE CALC
+            $m_f: (($font-size-max - $font-size-min) / ($lock-width-max - $lock-width-min));
+            $mx_f: $m_f * 100vw;
+            $b_f: if( $root==1, percentage( ($font-size-min - $m_f * $lock-width-min) / 16px), $font-size-min - ($m_f * $lock-width-min));
+            
+            // FONT SIZE SET VALUES
+            $font-size-value-min: if($root, percentage($font-size-min/16px), $font-size-min);
+            $font-size-value-responsive: 'calc( #{$mx_f} + #{$b_f} )';
+            $font-size-value-max: if($root, percentage($font-size-max/16px), $font-size-max);
+
+            // FONT SIZE OUTPUT
+            @if $lock==true {
+                font-size: #{$font-size-value-min};
+                @media (min-width: #{$lock-width-min}) {
+                    font-size: #{$font-size-value-responsive};
+                }
+                @media (min-width: #{$lock-width-max}) {
+                    font-size: #{$font-size-value-max};
+                }
+            }
+            @else {
+                font-size: #{$font-size-value-responsive};
+            }
+        }
+        
+    }
+    
+    // LINE HEIGHT
+    @if $line-height-min != '' and $line-height-max != ''{
+        // LINE HEIGHT CHECKS & FORMATTING
+        @if unit($line-height-min) !=unit($line-height-max) {
+            @warn 'Please enter line-height values of the same unit, either % or em';
+        }
+        @else if unit($line-height-min)=="rem" {
+            @warn 'Please enter line-height values in either % or em'
+        }
+        @else {
+            
+            @if unit($line-height-min)=="em" or unitless($line-height-min) {
+                @if unit($line-height-min)=="em" {
+                    $line-height-min: $line-height-min/1em;
+                    $line-height-max: $line-height-max/1em;
+                }
+                $line-height-min: $line-height-min * 100%;
+                $line-height-max: $line-height-max * 100%;
+            }
+            
+            // LINEHEIGHT CALC
+            $delta: ($font-size-min * $line-height-max / 100%) - ($font-size-min * $line-height-min / 100%);
+            $m_lh: ($delta - 0) / ($lock-width-max - $lock-width-min);
+            $mx_lh: $m_lh * 100vw;
+            $b_lh: if( $root==1, ( (0 - $m_lh * $lock-width-min) / 16), 0 - $m_lh * $lock-width-min);
+            
+            // CUSTOM PROPERTY SET VALUES
+            $line-height-value-min: $line-height-min;
+            $line-height-value-responsive: 'calc( #{$line-height-min} + #{$mx_lh} + #{$b_lh} )';
+            $line-height-value-max: $line-height-max;
+            
+            // LINEHEIGHT OUTPUT
+            @if $lock==true {
+                line-height: #{$line-height-value-min};
+                @media (min-width: #{$lock-width-min}) {
+                    line-height: #{$line-height-value-responsive};
+                }
+                @media (min-width: #{$lock-width-max}) {
+                    line-height: #{$line-height-value-max};
+                }
+            }
+            @else {
+                font-size: #{$line-height-value-responsive};
+            }
+        }
+    }
+    
+    // CUSTOM PROP
+    @if $prop != '' and $prop-min != '' and $prop-min != ''{
+        @if unit($prop-min) !=unit($prop-max){
+            @warn 'Please enter line-height values of the same unit';
+        }@else{
+            // CUSTOM PROP CALC
+            $m_c: (($prop-max - $prop-min) / ($lock-width-max - $lock-width-min));
+            $mx_c: $m_c * 100vw;
+            $b_c: $prop-min - ($m_c * $lock-width-min);
+            
+            // CUSTOM PROP SET VALUES
+            $prop-value-min: $prop-min;
+            $prop-value-responsive: 'calc( #{$mx_c} + #{$b_c} )';
+            $prop-value-max: $prop-max;
+            
+            // CUSTOM PROP OUTPUT
+            @if $lock==true {
+                #{$prop}: #{$prop-value-min};
+                @media (min-width: #{$lock-width-min}) {
+                    #{$prop}: #{$prop-value-responsive};
+                }
+                @media (min-width: #{$lock-width-max}) {
+                    #{$prop}: #{$prop-value-max};
+                }
+            }
+            @else {
+                font-size: #{$prop-value-responsive};
+            }
+        }
+    }
+    
+}
+
+$typography: (
+    'root': (
+        font-size: (16px, 25px),
+        line-height: (1.4, 1.65)
+    ),
+    'body, p, ul, ol': (
+        font-size: (18px, 21px),
+        line-height: (1.45, 1.58)
+    ),
+    'h1': (
+        font-size: (32px, 42px),
+        line-height: (1.2, 1.2)
+    ),
+    'h2': (
+        font-size: (24px, 28px),
+        line-height: (1.1, 1.2)
+    ),
+    'h3': (
+        font-size: (20px, 24px),
+        line-height: (1.1, 1.2)
+    ),
+    'h4': (
+        font-size: (16px, 20px),
+        line-height: (1.1, 1.2)
+    ),
+    'h5': (
+        font-size: (15px, 18px),
+        line-height: (1.1, 1.2)
+    ),
+    'h6': (
+        font-size: (14px, 16px),
+        line-height: (1.1, 1.2)
+    )
+);
+    
+@each $selector, $prop in $typography {
+    $lock-defs: '';
+
+    $fmin: nth(map-get($prop, font-size),1);
+    $fmax: nth(map-get($prop, font-size),2);
+    $lhmin: nth(map-get($prop, line-height),1);
+    $lhmax: nth(map-get($prop, line-height),2);
+
+    @if $selector == 'root' or $selector == 'html'{
+        #{$selector}{            
+            @include css-lock(
+                $font-size-min: unquote($fmin),
+                $font-size-max: unquote($fmax),
+                $line-height-min: unquote($lhmin),
+                $line-height-max: unquote($lhmax),
+                $root: 1
+            );
+        }
+    }
+    @else{
+        #{$selector}{
+            @include css-lock(
+                $font-size-min: unquote($fmin),
+                $font-size-max: unquote($fmax),
+                $line-height-min: unquote($lhmin),
+                $line-height-max: unquote($lhmax)
+            );
+        }
+    }
+};
+
+body{background: #f0f0f0;}    
+
+.copy{
+    $font-family-serif: serif;
+    $font-family-sans-serif: sans-serif;
+    $copy-color: #383838;
+    $headings-els: 'h1','h2','h3','h4','h5','h6','.h1','.h2','.h3','.h4','.h5','.h6';
+    $type-mod: 1rem;
+    
+    max-width: 48rem;
+    margin-left: auto;
+    margin-right: auto;
+    background: #FFF;
+    font-weight: 300;
+    font-family: $font-family-serif;
+    color: $copy-color;
+    
+    @include css-lock(
+        $prop:'padding',
+        $prop-min: 30px,
+        $prop-max: 50px
+    );
+    @include css-lock(
+        $prop: 'padding-left',
+        $prop-min: 30px,
+        $prop-max: 90px
+    );
+    @include css-lock(
+        $prop: 'padding-right',
+        $prop-min: 30px,
+        $prop-max: 90px
+    );
+    
+    // MARGINS
+    > *{
+        margin-top: $type-mod * 2;
+        margin-bottom: 0;
+    
+        &:first-child{
+            margin-top: 0;
+        }
+    }
+    
+    > * + #{$headings-els}{
+        margin-top: $type-mod * 2.4;
+    }
+    
+    #{$headings-els}{
+        font-family: $font-family-sans-serif;
+        font-weight: 600;
+        
+        & + * {
+            margin-top: $type-mod * .8;
+        }
+    }
+    
+    // SPECIAL ELS
+    ul,ol{
+        padding-left: 1rem;
+    }
+    
+    dt, li:not(:first-child){
+        margin-top: $type-mod * 1;
+    }
+    
+    hr{
+        margin-bottom: 0;
+        margin-top: $type-mod * 2.7;
+        display: block;
+        border: 0;
+        text-align: center;
+        height: 1px;
+        position: relative;
+        line-height: 0;
+        
+        & + * { margin-top: $type-mod * 2.7; }
+        
+        &:before {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            letter-spacing: 1rem;
+            height: .5em;
+            content: '...';
+            color: #999;
+        }
+    }    
+    
+    blockquote{
+        margin-bottom: 0;
+        padding-left: 1rem;
+        border-left: 3px solid #f5f5f5;
+        font-style: italic;
+        
+        @include css-lock(
+            $prop: 'padding-left',
+            $prop-min: 20px,
+            $prop-max: 35px
+        );
+    }
+}
+
+[data-info] {
+    position: relative;
+    &::after {
+        // content: attr(data-info);
+        display: block;
+        color: gray;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        transform: translate(0, 100%);
+        font-size: 10px;
+        line-height: 1;
+    }
+}
