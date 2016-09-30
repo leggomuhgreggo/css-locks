@@ -1,7 +1,5 @@
 'use strict';
 
-console.clear();
-
 var paragraphs = document.querySelectorAll('h1, h2, h3, p');
 
 function updateInfo() {
@@ -14,13 +12,6 @@ function updateInfo() {
         p.setAttribute('data-info', roundedFs + 'px / ' + ratio);
     });
 }
-
-updateInfo();
-
-window.addEventListener('resize', function () {
-    updateInfo();
-    getCPL(paragraphs[1]);
-});
 
 function getCPL(el) {
     var span = document.createElement('span');
@@ -48,3 +39,10 @@ function getCPL(el) {
     var avgCPL = aggregateCPL / samples;
     console.log(avgCPL);
 };
+
+updateInfo();
+
+window.addEventListener('resize', function () {
+    updateInfo();
+    getCPL(paragraphs[1]);
+});
